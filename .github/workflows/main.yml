@@ -16,13 +16,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-
-      - name: Connect to Windows VM and pull latest code
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /f/myproject/training-backend && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
       - name: Test SSH connection
         run: |
           ssh -v VMadmin@${{ secrets.SSH_HOST }} "echo SSH Connected"
+      - name: Connect to Windows VM and pull latest code
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /f/myproject/training-backend && git checkout ${{ secrets.MAIN_BRANCH }} && git pull"
+      
 
       - name: Cleanup
         run: rm -rf ~/.ssh
