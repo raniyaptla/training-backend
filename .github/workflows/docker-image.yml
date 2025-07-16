@@ -28,4 +28,18 @@ jobs:
         file: ./backend/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
-
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Azure VM via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.AZURE_VM_IP }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key: ${{ secrets.AZURE_VM_KEY }}
+          script: |
+              docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+              docker stop backend || true
+              docker rm backend || true
+              docker run -d --name backend -p 8001:8001 ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
