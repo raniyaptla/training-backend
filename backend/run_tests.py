@@ -11,7 +11,7 @@ def install_test_deps():
     print("📦 Installing test dependencies...")
     try:
         result = subprocess.run([
-            sys.executable, "-m", "pip", "install", "-r", "requirements-test.txt"
+            sys.executable, "-m", "pip", "install", "-r", "requirements.txt"
         ], capture_output=True, text=True)
         
         if result.returncode == 0:

@@ -24,10 +24,10 @@ jobs:
         cd backend
         pip install -r requirements-test.txt
     
-    - name: Run tests
+    - name: Run unit and integration tests
       run: |
         cd backend
-        python run_tests.py
+        pytest test_main.py test_integration.py -v
 
   build:
     needs: test
