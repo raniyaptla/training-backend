@@ -55,21 +55,34 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}    
         
-    - name: Build and push to Docker Hub
+    - name: Build Docker image (no push)
       uses: docker/build-push-action@v5
       with:
         context: ./backend
         file: ./backend/Dockerfile
-        push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+        push: false
+        tags: my-app:latest
+    
+    - name: Run Trivy vulnerability scan using Docker
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${{ github.workspace }}:/root/reports \
+          aquasec/trivy:latest image --format table \
+          --output /root/reports/trivy-report.txt my-app:latest
 
+    - name: Upload Trivy report
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-report
+        path: trivy-report.txt
+    
     - name: Build and push to GitHub Packages
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
-        file: ./backend/Dockerfile
-        push: true
-        tags: ghcr.io/${{ github.repository }}/backend:latest   
+            context: ./backend
+            file: ./backend/Dockerfile
+            push: true
+            tags: ghcr.io/${{ github.repository }}/backend:latest   
         
   deploy:
     needs: build
